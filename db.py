@@ -29,7 +29,7 @@ async def create_table():
     await database.execute(sql)
 
 
-async def add_user():
+async def add_user(user_id):
     """Добавление пользователя"""
 
     sql = """
@@ -43,7 +43,7 @@ async def add_user():
         ON CONFLICT DO NOTHING
     """
 
-    await database.execute(sql)
+    await database.execute(sql, values={'user_id': user_id})
 
 
 async def read():
