@@ -38,7 +38,7 @@ async def standart_message(message: types.Message):
         if message.text.startswith('add'):
             user_id = message.text.replace('add', '').strip()
             await message.answer(f'Добавляем пользователя {user_id} в белый список')
-            return await db.add_to_whitelist(user_id)
+            return await db.add_to_whitelist(int(user_id))
 
 
 if __name__ == '__main__':
