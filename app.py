@@ -3,29 +3,27 @@
 
 import logging
 
-from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
+from aiogram import types
 from aiogram.utils.executor import start_webhook
 
 import db
 import config
 
 
-bot = Bot(token=config.TOKEN)
-dp = Dispatcher(bot)
-
-
 async def on_startup(dispatcher):
     await db.create_table()
-    await bot.set_webhook(config.WEBHOOK_URL, drop_pending_updates=True)
+    await config.bot.set_webhook(config.WEBHOOK_URL, drop_pending_updates=True)
 
 
 async def on_shutdown(dispatcher):
-    await bot.delete_webhook()
+    await config.bot.delete_webhook()
 
 
-@dp.message_handler()
-async def echo(message: types.Message):
+@config.dp.message_handler(commands=['start'])
+async def start(message: types.Message):
+    """/start handler"""
+
+    await db.add_user(message.chat.id)
     users = await db.read()
     await message.answer(users)
 
@@ -33,7 +31,7 @@ async def echo(message: types.Message):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     start_webhook(
-        dispatcher=dp,
+        dispatcher=config.dp,
         webhook_path=config.WEBHOOK_PATH,
         skip_updates=True,
         on_startup=on_startup,
