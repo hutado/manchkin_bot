@@ -150,7 +150,7 @@ async def standart_message(message: types.Message):
             changes = int(message.text)
             db.strength_change(message.chat.id, changes)
         except ValueError:
-            await message.answer(f'После + должно быть число')0
+            await message.answer(f'После + должно быть число')
 
         info = await db.select_info(message.chat.id)
 
