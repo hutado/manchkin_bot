@@ -150,12 +150,16 @@ async def lvl_change(user_id, lvl):
     """Изменение уровня"""
 
     sql = """
+        BEGIN;
+        SAVEPOINT lvl_savepoint;
         UPDATE
             "Users"
         SET
             "Level" = "Level" + :lvl
         WHERE
-            "UserID" = :user_id
+            "UserID" = :user_id;
+        ROLLBACK TO SAVEPOINT lvl_savepoint;
+        COMMIT;
     """
 
     await database.execute(sql, values={'user_id': user_id, 'lvl': lvl})
