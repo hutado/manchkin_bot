@@ -29,7 +29,7 @@ async def create_table():
     sql_whitelist = """
         CREATE TABLE IF NOT EXISTS "WhiteList" (
             "UserID" INTEGER NOT NULL PRIMARY KEY,
-            CONSTRAINT "UserID_unique" UNIQUE ("UserID")
+            CONSTRAINT "UserID_whitelist_unique" UNIQUE ("UserID")
         );
     """
 
