@@ -73,7 +73,7 @@ def check_rights(func):
         #if not database.fetch_one(sql, values={'user_id': message.chat.id}):
         #    return func(message)
         user = database.fetch_one(sql, values={'user_id': message.chat.id})
-        return message.answer(f'{user}\n{bool(user)}')
+        return message.answer(f'{[next(user.values()) for i in user]}\n{bool(user)}')
         #return message.answer(NOT_AVAILABLE)
 
     return wrapper
