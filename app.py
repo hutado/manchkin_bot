@@ -21,6 +21,102 @@ async def on_shutdown(dispatcher):
     await config.bot.delete_webhook()
 
 
+###################
+# Handle commands #
+###################
+
+@config.dp.callback_query_handler(func=lambda call: True)
+@db.check_rights
+async def callback_inline(call: types.CallbackQuery):
+    """Обработка inline-кнопок"""
+
+    user_id = call.message.chat.id
+    config.bot.answer_callback_query(call.id)
+    info = ''
+    _keyboard = keyboard.inline_keyboard()
+
+    # Кнопка Человек
+    if call.data == "human":
+        await db.change_race(user_id, "Человек")
+
+    # Кнопка Котейка
+    if call.data == "cat":
+        await db.change_race(user_id, "Котейка")
+
+    # Кнопка Купец
+    if call.data == "seller":
+        await db.change_race(user_id, "Купец")
+
+    # Кнопка Сенс
+    if call.data == "sens":
+        await db.change_race(user_id, "Сенс")
+
+    # Кнопка Киборг
+    if call.data == "cyborg":
+        await db.change_class(user_id, "Киборг")
+
+    # Кнопка Мутант
+    if call.data == "mutant":
+        await db.change_class(user_id, "Мутант")
+
+    # Кнопка Голохотник
+    if call.data == "hunter":
+        await db.change_class(user_id, "Голохотник")
+
+    # Кнопка Гаджестянщик
+    if call.data == "scientist":
+        await db.change_class(user_id, "Гаджестянщик")
+
+    # Кнопка Без класса
+    if call.data == "without":
+        await db.change_class(user_id, "Без класса")
+
+    # Кнопка Доступные действия
+    if call.data == "actions":
+        info = strings.ALLOWED_ACTIONS
+        _keyboard = keyboard.rules_keyboard()
+
+    # Кнопка Фазы
+    if call.data == "phases":
+        info = strings.PHASES
+        _keyboard = keyboard.rules_keyboard()
+
+    # Кнопка Шмотки
+    if call.data == "clothes":
+        info = strings.CLOTHES
+        _keyboard = keyboard.rules_keyboard()
+
+    # Кнопка Спорные моменты
+    if call.data == "moments":
+        info = strings.MOMENTS
+        _keyboard = keyboard.rules_keyboard()
+
+    # Кнопка Напарники
+    if call.data == "team":
+        info = strings.TEAM
+        _keyboard = keyboard.rules_keyboard()
+
+    # Кнопка Обмен
+    if call.data == "changing":
+        info = strings.CHANGING
+        _keyboard = keyboard.rules_keyboard()
+
+    # Кнопка Смерть
+    if call.data == "death":
+        info = strings.DEATH
+        _keyboard = keyboard.rules_keyboard()
+
+    info = info or await db.select_info(user_id)
+
+    return await config.bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text=info,
+        parse_mode='Markdown',
+        reply_markup=_keyboard
+    )
+
+
 @config.dp.message_handler(commands=['start'])
 @db.check_rights
 async def start(message: types.Message):
@@ -31,6 +127,10 @@ async def start(message: types.Message):
 
     return await message.answer(info, parse_mode='Markdown', reply_markup=keyboard.keyboard_game())
 
+
+###################
+#  Manchkin menu  #
+###################
 
 @config.dp.message_handler(regexp=config.BUTTON['rules'])
 @db.check_rights
@@ -158,6 +258,10 @@ async def standart_message(message: types.Message):
 
     return await message.answer(strings.STANDART_STRING, parse_mode='Markdown', reply_markup=keyboard.keyboard_game())
 
+
+###################
+# Starting Server #
+###################
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
