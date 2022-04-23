@@ -70,10 +70,18 @@ def check_rights(func):
                 "UserID" = :user_id
         """
 
-        if database.execute(sql, values={'user_id': message.chat.id}):
+        if database.fetch_one(sql, values={'user_id': message.chat.id}):
             return func(message)
         return message.answer(NOT_AVAILABLE)
 
-
-
     return wrapper
+
+
+async def read(user_id):
+    sql = """
+        SELECT "UserID" FROM "WhiteList" WHERE "UserID" = :user_id
+    """
+
+    user = await database.fetch_one(sql, values={'user_id': user_id})
+
+    return user

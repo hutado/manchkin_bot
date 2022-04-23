@@ -25,7 +25,7 @@ async def start(message: types.Message):
     """/start handler"""
 
     await db.add_user(message.chat.id, message.chat.username or message.chat.first_name)
-    users = await db.read()
+    users = await db.read(message.chat.id)
     await message.answer(users)
 
 
