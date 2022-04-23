@@ -23,7 +23,7 @@ async def on_shutdown(dispatcher):
 async def start(message: types.Message):
     """/start handler"""
 
-    await db.add_user(message.chat.id)
+    await db.add_user(message.chat.id, message.chat.username or message.chat.first_name)
     users = await db.read()
     await message.answer(users)
 

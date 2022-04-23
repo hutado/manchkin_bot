@@ -29,21 +29,23 @@ async def create_table():
     await database.execute(sql)
 
 
-async def add_user(user_id):
+async def add_user(user_id, nickname):
     """Добавление пользователя"""
 
     sql = """
         INSERT INTO
             "Users" (
                 "UserID"
+                , "Nickname"
             )
         VALUES (
             :user_id
+            , :nickname
         )
         ON CONFLICT DO NOTHING
     """
 
-    await database.execute(sql, values={'user_id': user_id})
+    await database.execute(sql, values={'user_id': user_id, 'nickname': nickname})
 
 
 async def read():
