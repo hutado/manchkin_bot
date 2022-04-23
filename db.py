@@ -156,6 +156,7 @@ async def lvl_change(user_id, lvl):
             "Level" = "Level" + :lvl
         WHERE
             "UserID" = :user_id
+        ON CONFLICT DO NOTHING
     """
 
     await database.execute(sql, values={'user_id': user_id, 'lvl': lvl})
