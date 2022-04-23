@@ -25,7 +25,7 @@ async def on_shutdown(dispatcher):
 # Handle commands #
 ###################
 
-@config.dp.callback_query_handler(func=lambda call: True)
+@config.dp.callback_query_handler()
 @db.check_rights
 async def callback_inline(call: types.CallbackQuery):
     """Обработка inline-кнопок"""
