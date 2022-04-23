@@ -108,6 +108,7 @@ async def callback_inline(call: types.CallbackQuery):
 
     info = info or await db.select_info(user_id)
 
+    # Если сообщение не модифицировано будет исключение
     try:
         return await config.bot.edit_message_text(
             chat_id=call.message.chat.id,
@@ -123,7 +124,7 @@ async def callback_inline(call: types.CallbackQuery):
 @config.dp.message_handler(commands=['start'])
 @db.check_rights
 async def start(message: types.Message):
-    """/start handler"""
+    """Обработка /start"""
 
     await db.add_user(message.chat.id, message.chat.username or message.chat.first_name)
     info = await db.select_info(message.chat.id)
@@ -251,7 +252,7 @@ async def standart_message(message: types.Message):
     if message.text.startswith('+') or message.text.startswith('-'):
         try:
             changes = int(message.text)
-            db.strength_change(message.chat.id, changes)
+            await db.strength_change(message.chat.id, changes)
         except ValueError:
             await message.answer(f'После + должно быть число')
 

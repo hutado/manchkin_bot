@@ -8,26 +8,26 @@ from aiogram.dispatcher import Dispatcher
 
 ADMIN = int(os.getenv('ADMIN_ID'))
 
-# bot settings
+# Настройки бота
 TOKEN = os.getenv('BOT_TOKEN')
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 
-# webhook settings
+# Настройки вебхуков
 WEBHOOK_HOST = f'https://{HEROKU_APP_NAME}.herokuapp.com'
 WEBHOOK_PATH = f'/webhook/{TOKEN}'
 WEBHOOK_URL = f'{WEBHOOK_HOST}{WEBHOOK_PATH}'
 
-# webserver settings
+# Настройки сервера
 WEBAPP_HOST = '0.0.0.0'
 WEBAPP_PORT = os.getenv('PORT', default=8000)
 
-# database settings
+# Настройки БД
 DB_URL = os.getenv('DATABASE_URL')
 
-# unicode emoji
+# Unicode-коды emoji
 EMOJI = {
     'lvl_up': u'\U00002B06',
     'lvl_down': u'\U00002B07',
@@ -51,7 +51,7 @@ EMOJI = {
 
 }
 
-# buttons
+# Кнопки
 BUTTON = {
     'lvl_up': EMOJI['lvl_up'] + 'Поднять уровень',
     'lvl_down': EMOJI['lvl_down'] + 'Понизить уровень',
@@ -65,7 +65,7 @@ BUTTON = {
     'class': EMOJI['class'] + 'Класс',
 }
 
-# lvl icons
+# Иконки уровней
 LVLS = {
     10: u'\U0001F51F',
     9: u'\U00000039'+ u'\U000020E3',
