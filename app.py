@@ -7,6 +7,7 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
 
+import db
 import config
 
 
@@ -15,6 +16,7 @@ dp = Dispatcher(bot)
 
 
 async def on_startup(dispatcher):
+    await db.create_table()
     await bot.set_webhook(config.WEBHOOK_URL, drop_pending_updates=True)
 
 
@@ -24,7 +26,8 @@ async def on_shutdown(dispatcher):
 
 @dp.message_handler()
 async def echo(message: types.Message):
-    await message.answer(message.text)
+    users = await db.read()
+    await message.answer(users)
 
 
 if __name__ == '__main__':
