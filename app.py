@@ -28,7 +28,7 @@ async def start(message: types.Message):
 
     await db.add_user(message.chat.id, message.chat.username or message.chat.first_name)
     info = await db.select_info(message.chat.id)
-    return await message.answer(info)#, parse_mode='Markdown', reply_markup=keyboard.keyboard_game())
+    return await message.answer(info, parse_mode='Markdown', reply_markup=keyboard.keyboard_game())
 
 
 @config.dp.message_handler(content_types=["text"])
@@ -49,7 +49,8 @@ async def standart_message(message: types.Message):
             db.strength_change(message.chat.id, changes)
         except ValueError:
             await message.answer(f'После + должно быть число')
-        return await message.answer(db.select_info(message.chat.id), parse_mode='Markdown', reply_markup=keyboard.inline_keyboard())
+        info = await db.select_info(message.chat.id)
+        return await message.answer(info, parse_mode='Markdown', reply_markup=keyboard.inline_keyboard())
 
     return await message.answer(STANDART_STRING, parse_mode='Markdown', reply_markup=keyboard.keyboard_game())
 
