@@ -20,6 +20,7 @@ async def on_shutdown(dispatcher):
 
 
 @config.dp.message_handler(commands=['start'])
+@db.check_rights
 async def start(message: types.Message):
     """/start handler"""
 

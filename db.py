@@ -4,6 +4,7 @@
 from databases import Database
 
 from config import DB_URL
+from strings import NOT_AVAILABLE
 
 
 database = Database(DB_URL)
@@ -12,7 +13,7 @@ database = Database(DB_URL)
 async def create_table():
     """Создание таблицы"""
 
-    sql = """
+    sql_users = """
         CREATE TABLE IF NOT EXISTS "Users" (
             "UserID" INTEGER NOT NULL PRIMARY KEY,
             "Nickname" TEXT NOT NULL,
@@ -25,8 +26,16 @@ async def create_table():
         );
     """
 
+    sql_whitelist = """
+        CREATE TABLE IF NOT EXISTS "WhiteList" (
+            "UserID" INTEGER NOT NULL PRIMARY KEY,
+            CONSTRAINT "UserID_unique" UNIQUE ("UserID")
+        );
+    """
+
     await database.connect()
-    await database.execute(sql)
+    await database.execute(sql_users)
+    await database.execute(sql_whitelist)
 
 
 async def add_user(user_id, nickname):
@@ -48,11 +57,23 @@ async def add_user(user_id, nickname):
     await database.execute(sql, values={'user_id': user_id, 'nickname': nickname})
 
 
-async def read():
-    sql = """
-        SELECT * FROM "Users"
-    """
+def check_rights(func):
+    """Проверка прав"""
 
-    users = await database.fetch_all(sql)
+    def wrapper(message):
+        sql = """
+            SELECT
+                TRUE
+            FROM
+                "WhiteList"
+            WHERE
+                "UserID" = :user_id
+        """
 
-    return users
+        if database.execute(sql, values={'user_id': message.chat.id}):
+            return func(message)
+        return message.answer(NOT_AVAILABLE)
+
+
+
+    return wrapper
