@@ -25,6 +25,7 @@ async def create_table():
         );
     """
 
+    await database.connect()
     await database.execute(sql)
 
 
