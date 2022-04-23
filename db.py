@@ -3,23 +3,27 @@
 
 from databases import Database
 
-from config import DB_URL
-from strings import NOT_AVAILABLE
+import config
+import strings
 
 
-database = Database(DB_URL)
+database = Database(config.DB_URL)
 
 
 async def create_table():
     """Создание таблицы"""
 
+    sql = """
+        DROP TABLE "Users"
+    """
+
     sql_users = """
         CREATE TABLE IF NOT EXISTS "Users" (
             "UserID" INTEGER NOT NULL PRIMARY KEY,
             "Nickname" TEXT NOT NULL,
-            "Level" INTEGER NOT NULL DEFAULT 1,
-            "Sex" INTEGER NOT NULL DEFAULT 0,
-            "Strength" INTEGER NOT NULL DEFAULT 1,
+            "Level" INTEGER NOT NULL DEFAULT 1 CHECK ("Level" > 0 AND "Level" <= 10),
+            "Sex" BOOLEAN NOT NULL DEFAULT TRUE,
+            "Strength" INTEGER NOT NULL DEFAULT 0,
             "Race" TEXT NOT NULL DEFAULT 'Человек',
             "Class" TEXT NOT NULL DEFAULT 'Без класса',
             CONSTRAINT "UserID_unique" UNIQUE ("UserID")
@@ -34,6 +38,7 @@ async def create_table():
     """
 
     await database.connect()
+    await database.execute(sql)
     await database.execute(sql_users)
     await database.execute(sql_whitelist)
 
@@ -70,9 +75,14 @@ def check_rights(func):
                 "UserID" = :user_id
         """
 
-        if await database.fetch_one(sql, values={'user_id': message.chat.id}):
+        if 'chat' in message:
+            user_id = message.chat.id
+        else:
+            user_id = message.message.chat.id
+
+        if await database.fetch_one(sql, values={'user_id': user_id}):
             return await func(message)
-        return await message.answer(NOT_AVAILABLE)
+        return await message.answer(strings.NOT_AVAILABLE)
 
     return wrapper
 
@@ -92,3 +102,145 @@ async def add_to_whitelist(user_id):
     """
 
     await database.execute(sql, values={'user_id': user_id})
+
+
+async def select_info(user_id):
+    """Получение данных о пользователе"""
+
+    sql = """
+        SELECT
+            "Level"
+            , "Sex"
+            , "Strength"
+            , "Race"
+            , "Class"
+        FROM
+            "Users"
+        WHERE
+            "UserID" = :user_id
+    """
+
+    sql_opp = """
+        SELECT
+            "Nickname"
+            , "Level"
+            , "Sex"
+            , "Strength"
+            , "Race"
+            , "Class"
+        FROM
+            "Users"
+        WHERE
+            "UserID" <> :user_id
+    """
+
+    user_info = await database.fetch_one(sql, values={'user_id': user_id})
+    opp_info = await database.fetch_all(sql_opp, values={'user_id': user_id})
+
+    lvl = user_info[0]
+    sex = 'Мужчина' if user_info[1] else 'Женщина'
+    strength = user_info[2] + lvl
+    race = user_info[3]
+    class_ = user_info[4]
+    string = strings.GAME_STRING.format(config.LVLS[lvl], strength, sex, config.EMOJI[race] + race, config.EMOJI[class_] + class_)
+
+    for row in opp_info:
+        opp_sex = 'Мужчина' if row[2] else 'Женщина'
+        string = f'{string}\n*{row[0]}*\n`Уровень:` {config.LVLS[row[1]]}\n`Сила:` {row[3] + row[1]}\n`Пол:` {opp_sex}' + \
+            f'\n`Раса:` {config.EMOJI[row[4]] + row[4]}\n`Класс:` {config.EMOJI[row[5]] + row[5]}\n'
+
+    return string
+
+
+async def lvl_change(user_id, lvl):
+    """Изменение уровня"""
+
+    sql = """
+        UPDATE
+            "Users"
+        SET
+            "Level" = "Level" + :lvl
+        WHERE
+            "UserID" = :user_id
+    """
+
+    await database.execute(sql, values={'user_id': user_id, 'lvl': lvl})
+
+
+async def lvl_dropdown(user_id):
+    """Сброс персонажа"""
+
+    sql = """
+        UPDATE
+            "Users"
+        SET
+            "Level" = 1
+            , "Strength" = 0
+            , "Sex" = 0
+            , "Race" = 'Человек'
+            , "Class" = 'Без класса'
+        WHERE
+            "UserID" = :user_id
+    """
+
+    await database.execute(sql, values={'user_id': user_id})
+
+
+async def change_sex(user_id):
+    """Смена пола"""
+
+    sql = """
+        UPDATE
+            "Users"
+        SET
+            "Sex" = NOT "Sex"
+        WHERE
+            "UserID" = :user_id
+    """
+
+    await database.execute(sql, values={'user_id': user_id})
+
+
+async def strength_change(user_id, changes):
+    """Изменение силы"""
+
+    sql = """
+        UPDATE
+            "Users"
+        SET
+            "Strength" = "Strength" + :strength
+        WHERE
+            "UserID" = :user_id
+    """
+
+    await database.execute(sql, values={'user_id': user_id, 'strength': changes})
+
+
+async def change_race(user_id, race):
+    """Изменение расы"""
+
+    sql = """
+        UPDATE
+            "Users"
+        SET
+            "Race" = :race
+        WHERE
+            "UserID" = :user_id
+    """
+
+    await database.execute(sql, values={'user_id': user_id, 'race': race})
+
+
+async def change_class(user_id, class_):
+    """Изменение расы"""
+
+    sql = """
+        UPDATE
+            "Users"
+        SET
+            "Class" = :class
+        WHERE
+            "UserID" = :user_id
+    """
+
+    await database.execute(sql, values={'user_id': user_id, 'class': class_})
