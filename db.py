@@ -13,10 +13,6 @@ database = Database(config.DB_URL)
 async def create_table():
     """Создание таблицы"""
 
-    sql = """
-        DROP TABLE "Users"
-    """
-
     sql_users = """
         CREATE TABLE IF NOT EXISTS "Users" (
             "UserID" INTEGER NOT NULL PRIMARY KEY,
@@ -38,7 +34,6 @@ async def create_table():
     """
 
     await database.connect()
-    await database.execute(sql)
     await database.execute(sql_users)
     await database.execute(sql_whitelist)
 
@@ -146,8 +141,7 @@ async def select_info(user_id):
 
     for row in opp_info:
         opp_sex = 'Мужчина' if row[2] else 'Женщина'
-        string = f'{string}\n*{row[0]}*\n`Уровень:` {config.LVLS[row[1]]}\n`Сила:` {row[3] + row[1]}\n`Пол:` {opp_sex}' + \
-            f'\n`Раса:` {config.EMOJI[row[4]] + row[4]}\n`Класс:` {config.EMOJI[row[5]] + row[5]}\n'
+        string = f'{string}\n*{row[0]}*\n`Уровень:` {config.LVLS[row[1]]}\n`Сила:` {row[3] + row[1]}\n`Пол:` {opp_sex}\n`Раса:` {config.EMOJI[row[4]] + row[4]}\n`Класс:` {config.EMOJI[row[5]] + row[5]}\n'
 
     return string
 
