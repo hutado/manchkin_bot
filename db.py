@@ -63,7 +63,7 @@ def check_rights(func):
     def wrapper(message):
         sql = """
             SELECT
-                TRUE
+                "UserID"
             FROM
                 "WhiteList"
             WHERE
