@@ -60,7 +60,7 @@ async def add_user(user_id, nickname):
 def check_rights(func):
     """Проверка прав"""
 
-    def wrapper(message):
+    async def wrapper(message):
         sql = """
             SELECT
                 "UserID"
@@ -72,8 +72,8 @@ def check_rights(func):
 
         #if not database.fetch_one(sql, values={'user_id': message.chat.id}):
         #    return func(message)
-        user = database.fetch_one(sql, values={'user_id': message.chat.id})
-        return message.answer(f'{[next(user.values()) for i in user]}\n{bool(user)}')
+        user = await database.fetch_one(sql, values={'user_id': message.chat.id})
+        return await message.answer(f'{user}\n{bool(user)}')
         #return message.answer(NOT_AVAILABLE)
 
     return wrapper
