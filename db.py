@@ -170,7 +170,7 @@ async def lvl_dropdown(user_id):
         SET
             "Level" = 1
             , "Strength" = 0
-            , "Sex" = 0
+            , "Sex" = TRUE
             , "Race" = 'Человек'
             , "Class" = 'Без класса'
         WHERE
