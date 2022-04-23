@@ -6,7 +6,7 @@ from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
 
 
-ADMIN = os.getenv('ADMIN_ID')
+ADMIN = int(os.getenv('ADMIN_ID'))
 
 # bot settings
 TOKEN = os.getenv('BOT_TOKEN')

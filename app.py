@@ -36,7 +36,9 @@ async def standart_message(message: types.Message):
 
     if message.chat.id == config.ADMIN:
         if message.text.startswith('add'):
-            await db.add_to_whitelist(message.text.replace('add', '').strip())
+            user_id = message.text.replace('add', '').strip()
+            await message.answer(f'Добавляем пользователя {user_id} в белый список')
+            return await db.add_to_whitelist(user_id)
 
 
 if __name__ == '__main__':
