@@ -70,11 +70,9 @@ def check_rights(func):
                 "UserID" = :user_id
         """
 
-        #if not database.fetch_one(sql, values={'user_id': message.chat.id}):
-        #    return func(message)
-        user = await database.fetch_one(sql, values={'user_id': message.chat.id})
-        return await message.answer(f'{user}\n{bool(user)}')
-        #return message.answer(NOT_AVAILABLE)
+        if await database.fetch_one(sql, values={'user_id': message.chat.id}):
+            return await func(message)
+        return await message.answer(NOT_AVAILABLE)
 
     return wrapper
 
