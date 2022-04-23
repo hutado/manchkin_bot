@@ -155,7 +155,7 @@ async def lvl_change(user_id, lvl):
         SET
             "Level" = "Level" + :lvl
         WHERE
-            "UserID" = :user_id;
+            "UserID" = :user_id
             AND
             "Level" + :lvl >= 1
             AND
