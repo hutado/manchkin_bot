@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from dataclasses import replace
 import logging
 
 from aiogram import types
@@ -27,6 +28,15 @@ async def start(message: types.Message):
     await db.add_user(message.chat.id, message.chat.username or message.chat.first_name)
     users = await db.read(message.chat.id)
     await message.answer(users)
+
+
+@config.dp.message_handler(content_types=["text"])
+async def standart_message(message: types.Message):
+    """Обработка остальных команд"""
+
+    if message.chat.id == config.ADMIN:
+        if message.text.startswith('add'):
+            await db.add_to_whitelist(message.text.replace('add', '').strip())
 
 
 if __name__ == '__main__':

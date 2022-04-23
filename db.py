@@ -77,11 +77,18 @@ def check_rights(func):
     return wrapper
 
 
-async def read(user_id):
+async def add_to_whitelist(user_id):
+    """Добавление в белый список"""
+
     sql = """
-        SELECT "UserID" FROM "WhiteList" WHERE "UserID" = :user_id
+        INSERT INTO
+            "WhiteList" (
+                "UserID"
+            )
+        VALUES (
+            :user_id
+        )
+        ON CONFLICT DO NOTHING
     """
 
-    user = await database.fetch_one(sql, values={'user_id': user_id})
-
-    return user
+    await database.execute(sql, values={'user_id': user_id})
