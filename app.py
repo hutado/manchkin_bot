@@ -108,13 +108,16 @@ async def callback_inline(call: types.CallbackQuery):
 
     info = info or await db.select_info(user_id)
 
-    return await config.bot.edit_message_text(
-        chat_id=call.message.chat.id,
-        message_id=call.message.message_id,
-        text=info,
-        parse_mode='Markdown',
-        reply_markup=_keyboard
-    )
+    try:
+        return await config.bot.edit_message_text(
+            chat_id=call.message.chat.id,
+            message_id=call.message.message_id,
+            text=info,
+            parse_mode='Markdown',
+            reply_markup=_keyboard
+        )
+    except:
+        return None
 
 
 @config.dp.message_handler(commands=['start'])
